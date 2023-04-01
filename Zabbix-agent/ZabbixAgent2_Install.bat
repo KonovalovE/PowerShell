@@ -1,0 +1,1 @@
+PowerShell -NoProfile -ExecutionPolicy Unrestricted -Command %~dp0\ZabbixAgent2_Install.ps1
