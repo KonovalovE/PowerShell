@@ -1,1 +1,1 @@
-Скрипт установки Zabbix-agent2. 
+‘крипт установки Zabbix-agent2. 
