@@ -4,14 +4,14 @@
 #	DESCRIPTION: Installation script for BGInfo
 #
 #	AUTHOR: Evgeny Konovalov
-#	VERSION: 1.0
-#	CREATED: 01/04/2023 18:00:00 PM
+#	VERSION: 1.2
+#	CREATED: 02/05/2023
 # ======================================================= =================================
 #
 # Объявляем переменные
 
 #$BGI_LOCATION = \\dc01\gpo$\BGinfo
-$BGI_LOCATION = "D:\SCRIPTS\BGInfo"
+$BGI_LOCATION = "D:\SCRIPTS\BGInfo" 
 $BGI_FOLDER = "$Env:ProgramData\CNTEC\BGInfo"
 $BGI_XML = "bgi_task.xml"
 $BGI_CFG_CLIENT = "Client_template.bgi"
@@ -28,24 +28,6 @@ $BGI__PATH_old = "$Env:SystemRoot\BGINFO"
 $BGI_RPATH = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 $BGI_RKEYVALUE = "$BGI_FOLDER\Bginfo64.exe $BGI_FOLDER\$BGI_CFG_FILE /timer:0 /silent /nolicprompt"
 
-
-function Remove-BGInfo-Old{
-
-    # Проверяем существвует ли задание в автозагрузке, если существует то удаляем ее 
-    If ((Get-Item $BGI_RPATH -EA Ignore).Property -contains $BGI_RUN_old -eq $True){
-        Remove-ItemProperty -Path $BGI_RPATH -Name $BGI_RUN_old
-        }
-
-    # Проверяем существвует ли задание в диспетчере задач, если существует то удаляем ее 
-    If (Get-ScheduledTask $BGI_Task_old -ea 0){
-        Unregister-ScheduledTask -TaskName $BGI_Task_old -Confirm:$false
-        }
-
-    if (Test-Path $BGI__PATH_old) {
-        Remove-item $BGI__PATH_old -Recurse -Force
-        }
-}
-
 If (-not(Test-Path $BGI_FOLDER)) {
    New-Item -Path $BGI_FOLDER -ItemType "directory"
    New-Item -Path $BGI_FOLDER"\Extensions" -ItemType "directory"
@@ -60,8 +42,6 @@ If (-not((Get-WmiObject -Class Win32_OperatingSystem -Property ProductType).Prod
 Else { 
    Copy-Item $BGI_LOCATION"\Templates\"$BGI_CFG_SERVER -Destination $BGI_FOLDER"\"$BGI_CFG_FILE -Force 
 }
-
-Remove-BGInfo-Old
 
 # Проверяем существвует ли задание в автозагрузке если нет то создаем
 If (-not((Get-Item $BGI_RPATH -EA Ignore).Property -contains $BGI_KEY_task -eq $True)){
@@ -78,7 +58,6 @@ If (-not(Get-ScheduledTask $BGI_KEY_task -ea 0)){
     Remove-item $BGI_FOLDER"\"$BGI_XML -force
     #
     Start-ScheduledTask -TaskName $BGI_KEY_task -TaskPath "\CNTEC\"
-    #Get-ScheduledTask -TaskPath "\CNTEC\" | Start-ScheduledTask
 }
 
 
